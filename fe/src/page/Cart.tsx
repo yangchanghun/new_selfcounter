@@ -6,7 +6,7 @@ export default function Cart() {
   // const navigate = useNavigate();
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const [cart, setCart] = useState([1]);
+  const [cart] = useState([1]);
 
   useEffect(() => {
     if (audioRef.current) {

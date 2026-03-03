@@ -1,22 +1,9 @@
-import axios from "axios";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Home() {
   const navigate = useNavigate();
   const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  const [productForm, setProductForm] = useState([]);
-  const [form, setForm] = useState([]);
-  const [data, setSata] = useState("");
-
-  const REACT_APP_BASE_URL = "www.kioedu.co.kr";
-
-  useEffect(() => {
-    axios.get(`${REACT_APP_BASE_URL}/api/product/list/`).then((res) => {
-      setProductForm(res.data.product);
-    });
-  }, []);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -27,17 +14,6 @@ export default function Home() {
       });
     }
   }, []);
-
-
-
-  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      if (/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/.test(data)) {
-        alert("영어로 바꿔주세요");
-        return;
-      }
-    }
-  }
 
   return (
     <div
