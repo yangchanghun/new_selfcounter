@@ -32,7 +32,7 @@ export default function CartList() {
 
   // ✅ 상품 목록 불러오기
   useEffect(() => {
-    axios.get(`www.kioedu.co.kr/api/product/list/`).then((res) => {
+    axios.get(`https://www.kioedu.co.kr/api/product/list/`).then((res) => {
       console.log(res.data.product);
       setProducts(res.data.product);
     });
