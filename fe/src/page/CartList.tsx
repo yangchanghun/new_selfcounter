@@ -24,16 +24,16 @@ export default function CartList() {
   }, []);
 
   const navigate = useNavigate();
-
   const [products, setProducts] = useState<Product[]>([]);
-  const BASE_URL = "http://127.0.0.1:8000/";
+  const BASE_URL = "www.kioedu.co.kr";
   const [barcodeInput, setBarcodeInput] = useState("");
 
   const [cart, setCart] = useState<CartItem[]>([]);
 
   // ✅ 상품 목록 불러오기
   useEffect(() => {
-    axios.get(`${BASE_URL}/api/item/list/`).then((res) => {
+    axios.get(`${BASE_URL}/api/product/list/`).then((res) => {
+      console.log(res.data.product);
       setProducts(res.data.product);
     });
   }, []);
