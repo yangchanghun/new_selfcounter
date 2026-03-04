@@ -3,6 +3,7 @@ import axios from "axios";
 
 export default function ItemAddPage() {
   const [form, setForm] = useState({
+    id: 1,
     name: "",
     price: "",
     barcode_number: "",
@@ -63,6 +64,7 @@ export default function ItemAddPage() {
       alert("상품 등록 완료 🔥");
       console.log(res.data);
       setForm({
+        id: 1,
         name: "",
         price: "",
         barcode_number: "",
