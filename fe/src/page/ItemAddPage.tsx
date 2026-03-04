@@ -9,8 +9,8 @@ export default function ItemAddPage() {
     product_image: null as File | null,
   });
 
-  const REACT_APP_BASE_URL = "http://127.0.0.1:8000";
-
+  const REACT_APP_BASE_URL = "https://www.kioedu.co.kr";
+  const [errorMsg, setErrorMsg] = useState("");
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, files } = e.target;
 
@@ -22,6 +22,20 @@ export default function ItemAddPage() {
   };
 
   const handleSubmit = async () => {
+    if (!form.name.trim()) {
+      alert("상품 이름을 입력해주세요.");
+      return;
+    }
+
+    if (!form.price) {
+      alert("가격을 입력해주세요.");
+      return;
+    }
+
+    if (!form.product_image) {
+      alert("상품 이미지를 선택해주세요.");
+      return;
+    }
     try {
       const formData = new FormData();
 
@@ -37,7 +51,7 @@ export default function ItemAddPage() {
       }
 
       const res = await axios.post(
-        `${REACT_APP_BASE_URL}/api/item/register/`,
+        `${REACT_APP_BASE_URL}/api/product/register/`,
         formData,
         {
           headers: {
@@ -56,8 +70,11 @@ export default function ItemAddPage() {
       });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      console.error(error);
-      alert("등록 실패");
+      if (error.response?.data?.error) {
+        setErrorMsg(error.response.data.error);
+      } else {
+        setErrorMsg("등록 실패");
+      }
     }
   };
 
@@ -121,6 +138,7 @@ export default function ItemAddPage() {
           </button>
         </div>
       </div>
+      {errorMsg && <p className="text-red-500 text-sm mt-2">{errorMsg}</p>}
     </div>
   );
 }

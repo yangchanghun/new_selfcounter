@@ -14,7 +14,7 @@ export default function ItemListPage() {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const BASE_URL = "http://127.0.0.1:8000";
+  const BASE_URL = "https://www.kioedu.co.kr";
 
   useEffect(() => {
     fetchItems();
@@ -22,7 +22,7 @@ export default function ItemListPage() {
 
   const fetchItems = async () => {
     try {
-      const res = await axios.get(`${BASE_URL}/api/item/list/`);
+      const res = await axios.get(`${BASE_URL}/api/product/list/`);
       console.log(res.data);
       setItems(res.data.product);
     } catch (err) {
