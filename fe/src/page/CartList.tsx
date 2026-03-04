@@ -25,7 +25,7 @@ export default function CartList() {
 
   const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
-
+  const [debugScan, setDebugScan] = useState("");
   // const [barcodeInput, setBarcodeInput] = useState("");
   const bufferRef = useRef("");
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -110,17 +110,20 @@ export default function CartList() {
         const raw = bufferRef.current.trim();
         bufferRef.current = "";
 
+        setDebugScan(raw); // 🔥 화면에 표시
+
         if (!raw) return;
 
-        // QR 문자열에서 바코드 숫자만 추출
         const match = raw.match(/barcode_number[:"]*([0-9]+)/);
 
         if (!match) {
-          console.log("QR 형식 오류:", raw);
+          setDebugScan("QR 형식 오류: " + raw);
           return;
         }
 
         const barcode = match[1];
+
+        setDebugScan("barcode: " + barcode); // 🔥 확인용
 
         handleBarcode(barcode);
         return;
@@ -163,7 +166,7 @@ export default function CartList() {
         <div className="text-center text-gray-600 text-lg mb-4">
           상품 수량 {totalCount}
         </div>
-
+        <div className="text-red-500 text-xl mb-4">스캔값: {debugScan}</div>
         <div className="border-t border-gray-300 mb-4" />
 
         {/* 상품 리스트 */}
