@@ -17,17 +17,17 @@ interface Product {
 }
 
 export default function CartList() {
-  const inputRef = useRef<HTMLInputElement>(null);
+  // const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
+  // useEffect(() => {
+  //   inputRef.current?.focus();
+  // }, []);
 
   const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
 
-  const [barcodeInput, setBarcodeInput] = useState("");
-
+  // const [barcodeInput, setBarcodeInput] = useState("");
+  const bufferRef = useRef("");
   const [cart, setCart] = useState<CartItem[]>([]);
 
   // ✅ 상품 목록 불러오기
@@ -48,9 +48,40 @@ export default function CartList() {
     [cart],
   );
 
-  const handleBarcodeInput = () => {
+  // const handleBarcodeInput = () => {
+  //   const found = products.find(
+  //     (product) => product.barcode_number === barcodeInput,
+  //   );
+
+  //   if (!found) {
+  //     alert("상품 없음");
+  //     return;
+  //   }
+
+  //   setCart((prev) => {
+  //     const existing = prev.find((item) => item.id === found.id);
+
+  //     if (existing) {
+  //       return prev.map((item) =>
+  //         item.id === found.id
+  //           ? { ...item, quantity: item.quantity + 1 }
+  //           : item,
+  //       );
+  //     }
+
+  //     return [...prev, { ...found, quantity: 1 }];
+  //   });
+
+  //   setBarcodeInput(""); // 입력 초기화
+  // };
+  // const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  //   if (e.key === "Enter") {
+  //     handleBarcodeInput();
+  //   }
+  // };
+  const handleBarcode = (barcode: string) => {
     const found = products.find(
-      (product) => product.barcode_number === barcodeInput,
+      (product) => product.barcode_number === barcode,
     );
 
     if (!found) {
@@ -71,20 +102,32 @@ export default function CartList() {
 
       return [...prev, { ...found, quantity: 1 }];
     });
+  };
 
-    setBarcodeInput(""); // 입력 초기화
-  };
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      handleBarcodeInput();
-    }
-  };
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === "Tab") {
+        const code = bufferRef.current.trim();
+        if (!code) return;
+
+        handleBarcode(code);
+        bufferRef.current = "";
+      } else {
+        bufferRef.current += e.key;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [products]);
+
   return (
     <div
-      onClick={() => inputRef.current?.focus()}
+      // onClick={() => inputRef.current?.focus()}
       className="h-full px-4 md:px-10 pb-6 flex flex-col"
     >
-      <div className="flex gap-2 mb-4">
+      {/* <div className="flex gap-2 mb-4">
         <input
           ref={inputRef}
           type="text"
@@ -100,7 +143,7 @@ export default function CartList() {
         >
           추가
         </button>
-      </div>
+      </div> */}
       <div className="flex-1 min-h-0 bg-white rounded-2xl md:rounded-3xl shadow-xl p-4 md:p-10 flex flex-col">
         {/* 상품 수량 */}
         <div className="text-center text-gray-600 text-lg mb-4">
