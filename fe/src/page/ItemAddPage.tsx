@@ -5,6 +5,7 @@ export default function ItemAddPage() {
   const [form, setForm] = useState({
     id: 1,
     name: "",
+    description: "",
     price: "",
     barcode_number: "",
     product_image: null as File | null,
@@ -67,6 +68,7 @@ export default function ItemAddPage() {
         id: 1,
         name: "",
         price: "",
+        description: "",
         barcode_number: "",
         product_image: null,
       });
