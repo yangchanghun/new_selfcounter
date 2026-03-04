@@ -43,6 +43,8 @@ export default function ItemAddPage() {
 
       formData.append("name", form.name);
       formData.append("price", form.price);
+      formData.append("description", form.description);
+      formData.append("category_id", form.category_id.toString());
 
       if (form.barcode_number) {
         formData.append("barcode_number", form.barcode_number);
