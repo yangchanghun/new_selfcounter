@@ -107,12 +107,26 @@ export default function CartList() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Enter" || e.key === "Tab") {
-        const code = bufferRef.current.trim();
-        if (!code) return;
-
-        handleBarcode(code);
+        const raw = bufferRef.current.trim();
         bufferRef.current = "";
-      } else {
+
+        if (!raw) return;
+
+        // QR 문자열에서 바코드 숫자만 추출
+        const match = raw.match(/barcode_number[:"]*([0-9]+)/);
+
+        if (!match) {
+          console.log("QR 형식 오류:", raw);
+          return;
+        }
+
+        const barcode = match[1];
+
+        handleBarcode(barcode);
+        return;
+      }
+
+      if (e.key.length === 1) {
         bufferRef.current += e.key;
       }
     };
@@ -120,7 +134,7 @@ export default function CartList() {
     window.addEventListener("keydown", handleKeyDown);
 
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [products]);
+  }, []);
 
   return (
     <div
