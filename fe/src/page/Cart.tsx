@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import CartList from "./CartList";
 
 export default function Cart() {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const [cart] = useState([1]);
@@ -24,6 +24,9 @@ export default function Cart() {
         {/* 상단 이미지 */}
         <div className="w-full">
           <img
+            onClick={() => {
+              navigate("/itemadd");
+            }}
             src="/kio-banner.png"
             alt="상단 타이틀"
             className="w-full object-cover"
