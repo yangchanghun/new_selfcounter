@@ -18,7 +18,7 @@ interface Product {
 
 export default function CartList() {
   const navigate = useNavigate();
-  const [products, setProducts] = useState<Product[]>([]);
+  const [, setProducts] = useState<Product[]>([]);
   const [debugScan, setDebugScan] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
 
