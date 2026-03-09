@@ -18,6 +18,7 @@ interface Product {
 
 export default function CartList() {
   const navigate = useNavigate();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [products, setProducts] = useState<Product[]>([]);
   const [debugScan, setDebugScan] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
