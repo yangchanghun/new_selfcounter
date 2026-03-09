@@ -29,9 +29,9 @@ export default function CartList() {
   // 상품 목록 로드
   useEffect(() => {
     axios.get(`https://www.kioedu.co.kr/api/product/list/`).then((res) => {
+      console.log(res.data.product);
       setProducts(res.data.product);
     });
-    console.log(products);
   }, []);
 
   // 장바구니 추가 로직
