@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useMemo, useState, useRef, useCallback } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface CartItem {
@@ -18,98 +18,88 @@ interface Product {
 
 export default function CartList() {
   const navigate = useNavigate();
-  const [, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [debugScan, setDebugScan] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [inputValue, setInputValue] = useState(""); // 스캔 데이터를 담을 state
 
-  const bufferRef = useRef("");
-  const lastKeyTimeRef = useRef<number>(0);
   const hiddenInputRef = useRef<HTMLInputElement>(null);
 
-  // 상품 목록 로드
+  // 1. 서버에서 상품 목록 로드
   useEffect(() => {
     axios.get(`https://www.kioedu.co.kr/api/product/list/`).then((res) => {
-      console.log(res.data.product);
-      setProducts(res.data.product);
+      // API 구조에 맞춰 product 배열 설정
+      setProducts(res.data.product || []);
     });
   }, []);
 
-  // 장바구니 추가 로직
-  const handleBarcode = useCallback((barcode: string) => {
-    setProducts((currentProducts) => {
-      const found = currentProducts.find((p) => p.barcode_number === barcode);
-      if (!found) {
-        setDebugScan(`미등록 상품: ${barcode}`);
-        return currentProducts;
-      }
-
-      setCart((prev) => {
-        const existing = prev.find((item) => item.id === found.id);
-        if (existing) {
-          return prev.map((item) =>
-            item.id === found.id
-              ? { ...item, quantity: item.quantity + 1 }
-              : item,
-          );
-        }
-        return [...prev, { ...found, quantity: 1 }];
-      });
-      return currentProducts;
-    });
-  }, []);
-
-  // 데이터 파싱 (JSON & 숫자)
-  const processRawData = (raw: string) => {
-    const data = raw.trim();
-    if (!data) return;
-
-    // 1. JSON 시도
-    try {
-      const parsed = JSON.parse(data);
-      if (parsed.barcode_number) {
-        handleBarcode(parsed.barcode_number.toString());
-        setDebugScan(`JSON: ${parsed.barcode_number}`);
-        return;
-      }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
-    } catch (e) {}
-
-    // 2. 정규식 시도
-    const match = data.match(/barcode_number[:"]*([0-9]+)/);
-    if (match) {
-      handleBarcode(match[1]);
-      setDebugScan(`Pattern: ${match[1]}`);
-      return;
-    }
-
-    // 3. 일반 숫자 바코드 시도
-    if (/^\d+$/.test(data)) {
-      handleBarcode(data);
-      setDebugScan(`Number: ${data}`);
-      return;
-    }
-    setDebugScan(`Unknown: ${data}`);
+  // 2. 입력값 변경 핸들러
+  const onDataChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
   };
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const now = Date.now();
-      // 스캐너 입력은 매우 빠르므로 100ms 간격으로 버퍼 관리
-      if (now - lastKeyTimeRef.current > 100) bufferRef.current = "";
-      lastKeyTimeRef.current = now;
+  // 3. 엔터키 입력 시 데이터 처리 (핵심 로직)
+  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      const raw = inputValue.trim();
+      if (!raw) return;
 
-      if (e.key === "Enter" || e.key === "Tab") {
-        e.preventDefault();
-        processRawData(bufferRef.current);
-        bufferRef.current = "";
-      } else if (e.key.length === 1) {
-        bufferRef.current += e.key;
+      // 한글 입력 방지 체크
+      if (/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/.test(raw)) {
+        setInputValue("");
+        alert("키보드 상태를 영문으로 변경해주세요.");
+        return;
       }
-    };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleBarcode]);
+      let scannedBarcode = "";
+
+      // [파싱 로직] JSON 인지 일반 숫자인지 확인
+      try {
+        const parsed = JSON.parse(raw);
+        scannedBarcode = parsed.barcode_number
+          ? parsed.barcode_number.toString()
+          : raw;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (err) {
+        // JSON이 아니면 정규식으로 숫자만 추출 시도하거나 전체를 바코드로 인식
+        const match = raw.match(/barcode_number[:"]*([0-9]+)/);
+        scannedBarcode = match ? match[1] : raw;
+      }
+
+      // [장바구니 추가 로직]
+      const matched = products.find(
+        (p) => String(p.barcode_number) === String(scannedBarcode),
+      );
+
+      if (matched) {
+        setCart((prevCart) => {
+          const exist = prevCart.find((item) => item.id === matched.id);
+          if (exist) {
+            return prevCart.map((item) =>
+              item.id === matched.id
+                ? { ...item, quantity: item.quantity + 1 }
+                : item,
+            );
+          }
+          return [
+            ...prevCart,
+            {
+              id: matched.id,
+              name: matched.name,
+              price: matched.price,
+              quantity: 1,
+            },
+          ];
+        });
+        setDebugScan(`성공: ${matched.name}`);
+      } else {
+        setDebugScan(`미등록: ${scannedBarcode}`);
+        alert(`상품 정보가 없습니다. (${scannedBarcode})`);
+      }
+
+      setInputValue(""); // 입력창 초기화
+    }
+  };
 
   const totalPrice = useMemo(
     () => cart.reduce((s, i) => s + i.price * i.quantity, 0),
@@ -122,11 +112,14 @@ export default function CartList() {
 
   return (
     <div className="h-full px-4 md:px-10 pb-6 flex flex-col relative">
-      {/* 키보드 방지용 가짜 인풋 (필요시) */}
+      {/* 💡 숨겨진 스캔 전용 인풋 */}
       <input
         ref={hiddenInputRef}
         type="text"
-        inputMode="none"
+        value={inputValue}
+        onChange={onDataChange}
+        onKeyDown={onKeyDown}
+        inputMode="none" // 소프트 키보드 방지
         autoFocus
         className="absolute opacity-0 pointer-events-none"
         onBlur={() => setTimeout(() => hiddenInputRef.current?.focus(), 100)}
@@ -137,33 +130,41 @@ export default function CartList() {
           상품 수량 {totalCount}
         </div>
         <div className="text-red-500 font-mono text-center mb-4">
-          스캔: {debugScan || "대기 중..."}
+          스캔 상태: {debugScan || "대기 중..."}
         </div>
 
+        {/* 장바구니 리스트 */}
         <div className="flex-1 overflow-y-auto space-y-4">
-          {cart.map((item) => (
-            <div
-              key={item.id}
-              className="flex justify-between items-center text-xl border-b pb-2"
-            >
-              <span className="flex-1 font-bold">{item.name}</span>
-              <span className="w-20 text-center text-blue-600">
-                {item.quantity}개
-              </span>
-              <span className="w-32 text-right">
-                {(item.price * item.quantity).toLocaleString()}원
-              </span>
+          {cart.length === 0 ? (
+            <div className="h-full flex items-center justify-center text-gray-300 italic">
+              상품을 스캔해 주세요.
             </div>
-          ))}
+          ) : (
+            cart.map((item) => (
+              <div
+                key={item.id}
+                className="flex justify-between items-center text-xl border-b pb-2"
+              >
+                <span className="flex-1 font-bold">{item.name}</span>
+                <span className="w-20 text-center text-blue-600 font-black">
+                  {item.quantity}개
+                </span>
+                <span className="w-32 text-right">
+                  {item.price.toLocaleString()}원
+                </span>
+              </div>
+            ))
+          )}
         </div>
 
+        {/* 결제 영역 */}
         <div className="mt-6 border-t pt-6 flex gap-4 h-32">
           <div className="flex-1 flex flex-col justify-center">
-            <div className="flex justify-between text-gray-600">
+            <div className="flex justify-between text-gray-600 text-lg">
               <span>합계</span>
               <span>{totalPrice.toLocaleString()}원</span>
             </div>
-            <div className="flex justify-between text-2xl font-black mt-2">
+            <div className="flex justify-between text-2xl font-black mt-2 text-red-600">
               <span>결제금액</span>
               <span>{totalPrice.toLocaleString()}원</span>
             </div>
@@ -173,7 +174,11 @@ export default function CartList() {
               cart.length > 0 &&
               navigate("/pay", { state: { totalPrice, cart } })
             }
-            className={`flex-1 text-3xl font-bold rounded-2xl ${cart.length > 0 ? "bg-[#A8CBB3]" : "bg-gray-200 text-gray-400"}`}
+            className={`flex-1 text-3xl font-bold rounded-2xl shadow-md transition-colors ${
+              cart.length > 0
+                ? "bg-[#A8CBB3] text-white"
+                : "bg-gray-200 text-gray-400"
+            }`}
           >
             결제하기
           </button>
