@@ -42,6 +42,9 @@ export default function CartList() {
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       const raw = inputValue.trim();
+
+      console.log(raw);
+
       if (!raw) return;
 
       // 한글 입력 방지 체크
@@ -67,9 +70,11 @@ export default function CartList() {
       }
 
       // [장바구니 추가 로직]
-      const matched = products.find(
-        (p) => String(p.barcode_number) === String(scannedBarcode),
-      );
+      const matched = products.find((p) => {
+        console.log("매칭 시도:", p.barcode_number, scannedBarcode);
+        // 결과값을 명시적으로 return 해줘야 합니다.
+        return String(p.barcode_number) === String(scannedBarcode);
+      });
 
       if (matched) {
         setCart((prevCart) => {
