@@ -1,34 +1,60 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
+interface CartItem {
+  id: number;
+  name: string;
+  price: number;
+  quantity: number;
+}
 export default function PayPage() {
   const location = useLocation();
   const totalPrice = location.state?.totalPrice || 0;
-  const cart = location.state?.cart || [];
 
-  const [payModal, setPayModal] = useState(false);
   const [completeModal, setCompleteModal] = useState(false);
   const navigate = useNavigate();
-  // 🔥 10초 후 자동 결제
-  useEffect(() => {
-    if (!payModal) return;
 
-    const timer = setTimeout(() => {
+  const [cart, setCart] = useState<CartItem[]>(location.state?.cart || []);
+  const totalCount = cart.reduce((s, i) => s + i.quantity, 0);
+  const startCard = () => {
+    if (window.CardBridge?.openCardApp) {
+      window.CardBridge.openCardApp(totalPrice);
+    } else {
+      // setDebug("없음");
+      alert("AndroidBridge 없음 (웹에서 실행 중)");
+    }
+  };
+
+  useEffect(() => {
+    window.onCardPaymentComplete = () => {
+      console.log("카드 결제 완료");
+
       if (window.AndroidBridge?.printReceipt) {
-        try {
-          window.AndroidBridge.printReceipt(JSON.stringify(cart));
-        } catch (e) {
-          console.log("프린트 실패:", e);
-        }
+        window.AndroidBridge.printReceipt(JSON.stringify(cart));
       }
 
-      setPayModal(false);
       setCompleteModal(true);
-    }, 10000);
+    };
+    return () => {
+      window.onCardPaymentComplete = undefined;
+    };
+  }, []);
+  const removeItem = (id: number) => {
+    setCart((prev) => prev.filter((item) => item.id !== id));
+  };
 
-    return () => clearTimeout(timer);
-  }, [payModal, cart]);
-
+  const updateQuantity = (id: number, delta: number) => {
+    setCart((prev) =>
+      prev.map((item) => {
+        if (item.id === id) {
+          const newQuantity = item.quantity + delta;
+          // 최소 수량은 1개로 제한 (0개가 되면 삭제하고 싶다면 아래 removeItem 로직 참고)
+          return { ...item, quantity: newQuantity < 1 ? 1 : newQuantity };
+        }
+        return item;
+      }),
+    );
+  };
   return (
     <div className="min-h-screen bg-gray-200 flex justify-center">
       <div className="w-full md:w-[720px] min-h-screen bg-[#A8CBB3] flex flex-col shadow-xl">
@@ -39,7 +65,65 @@ export default function PayPage() {
             className="w-full object-cover"
           />
         </div>
+        {cart.length > 0 && (
+          <div className="bg-card rounded-2xl p-5 w-full max-w-sm shadow-md">
+            <p className="font-black text-card-foreground mb-3">주문 내역</p>
+            <div className="flex flex-col gap-2">
+              {cart.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between text-card-foreground"
+                >
+                  {/* 왼쪽 : 상품 */}
+                  <div className="flex flex-col">
+                    <span className="font-semibold">{item.name}</span>
+                    <span className="text-sm text-gray-500">
+                      {(item.price * item.quantity).toLocaleString()}원
+                    </span>
+                  </div>
 
+                  {/* 오른쪽 : 수량조절 */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 bg-gray-100 rounded-full px-3 py-1">
+                      <button
+                        onClick={() => updateQuantity(item.id, -1)}
+                        className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-sm text-gray-600 active:bg-gray-200"
+                      >
+                        -
+                      </button>
+
+                      <span className="w-8 text-center font-black text-blue-600">
+                        {item.quantity}
+                      </span>
+
+                      <button
+                        onClick={() => updateQuantity(item.id, 1)}
+                        className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-sm text-gray-600 active:bg-gray-200"
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    <button
+                      onClick={() => removeItem(item.id)}
+                      className="text-black font-bold hover:text-red-500 text-lg"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="border-t border-border mt-3 pt-3 flex justify-between items-center">
+              <span className="text-sm text-muted-foreground">
+                총 {totalCount}개
+              </span>
+              <span className="font-black text-lg text-foreground">
+                {totalPrice.toLocaleString()}원
+              </span>
+            </div>
+          </div>
+        )}
         <div className="flex-1 bg-gray-100 rounded-t-3xl -mt-6 px-6 md:px-10 pt-8 pb-10 flex flex-col">
           <div className="bg-white shadow rounded-lg py-4 px-4 text-center text-lg font-medium mb-8">
             <span className="font-bold text-xl">
@@ -54,7 +138,7 @@ export default function PayPage() {
             </button>
 
             <button
-              onClick={() => setPayModal(true)}
+              onClick={startCard}
               className="bg-white border rounded-xl py-8 text-xl font-semibold shadow"
             >
               카드결제
@@ -70,23 +154,6 @@ export default function PayPage() {
           </div>
         </div>
       </div>
-
-      {/* 🔥 카드 결제 모달 */}
-      {payModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg text-center">
-            <img src="card_modal.gif" alt="카드 결제" />
-            <p className="mt-4 text-lg">카드 단말기에 카드를 삽입해주세요...</p>
-
-            <p
-              onClick={() => setPayModal(false)}
-              className="text-center text-2xl font-semibold mt-6 cursor-pointer text-red-500"
-            >
-              취소
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* 🔥 결제 완료 모달 */}
       {completeModal && (

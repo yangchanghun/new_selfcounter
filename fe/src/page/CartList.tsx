@@ -19,12 +19,14 @@ interface Product {
 export default function CartList() {
   const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
-  const [debugScan, setDebugScan] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [inputValue, setInputValue] = useState(""); // 스캔 데이터를 담을 state
-
+  const [debugScan, setDebugScan] = useState("");
   const hiddenInputRef = useRef<HTMLInputElement>(null);
-
+  const lastScannedRef = useRef<{ barcode: string; time: number }>({
+    barcode: "",
+    time: 0,
+  });
   // 1. 서버에서 상품 목록 로드
   useEffect(() => {
     axios.get(`https://www.kioedu.co.kr/api/product/list/`).then((res) => {
@@ -42,10 +44,22 @@ export default function CartList() {
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       const raw = inputValue.trim();
-
-      console.log(raw);
-
+      // console.log(products);
+      // console.log(raw);
       if (!raw) return;
+
+      const now = Date.now();
+      // 동일한 바코드가 500ms(0.5초) 이내에 다시 들어오면 무시
+      if (
+        raw === lastScannedRef.current.barcode &&
+        now - lastScannedRef.current.time < 500
+      ) {
+        console.log("중복 스캔 차단됨:", raw);
+        setInputValue(""); // 입력창만 비우고 리턴
+        return;
+      }
+
+      lastScannedRef.current = { barcode: raw, time: now };
 
       // 한글 입력 방지 체크
       if (/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/.test(raw)) {
@@ -68,10 +82,9 @@ export default function CartList() {
         const match = raw.match(/barcode_number[:"]*([0-9]+)/);
         scannedBarcode = match ? match[1] : raw;
       }
-
       // [장바구니 추가 로직]
       const matched = products.find((p) => {
-        console.log("매칭 시도:", p.barcode_number, scannedBarcode);
+        // console.log("매칭 시도:", p.barcode_number, scannedBarcode);
         // 결과값을 명시적으로 return 해줘야 합니다.
         return String(p.barcode_number) === String(scannedBarcode);
       });
@@ -98,7 +111,7 @@ export default function CartList() {
         });
         setDebugScan(`성공: ${matched.name}`);
       } else {
-        setDebugScan(`미등록: ${scannedBarcode}`);
+        setDebugScan(`실패: ${scannedBarcode}`);
         alert(`상품 정보가 없습니다. (${scannedBarcode})`);
       }
 
