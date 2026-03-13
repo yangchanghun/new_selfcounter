@@ -11,7 +11,7 @@ export default function PayPage() {
   const location = useLocation();
   const totalPrice = location.state?.totalPrice || 0;
 
-  const [completeModal, setCompleteModal] = useState(true);
+  const [completeModal, setCompleteModal] = useState(false);
   const navigate = useNavigate();
 
   const [cart, setCart] = useState<CartItem[]>(location.state?.cart || []);
@@ -80,50 +80,58 @@ export default function PayPage() {
           <div className="bg-card rounded-2xl p-5 w-full max-w-sm shadow-md">
             <p className="font-black text-card-foreground mb-3">주문 내역</p>
             <div className="flex flex-col gap-2">
-              {cart.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between text-card-foreground"
-                >
-                  {/* 왼쪽 : 상품 */}
-                  <div className="flex flex-col">
-                    <span className="font-semibold">{item.name}</span>
-                    <span className="text-sm text-gray-500">
-                      {(item.price * item.quantity).toLocaleString()}원
-                    </span>
-                  </div>
+              {cart.map((item) => {
+                const itemTotal = item.price * item.quantity;
 
-                  {/* 오른쪽 : 수량조절 */}
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-3 bg-gray-100 rounded-full px-3 py-1">
-                      <button
-                        onClick={() => updateQuantity(item.id, -1)}
-                        className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-sm text-gray-600 active:bg-gray-200"
-                      >
-                        -
-                      </button>
+                return (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between py-2 border-b last:border-none"
+                  >
+                    {/* 상품 정보 */}
+                    <div className="flex flex-col">
+                      <span className="font-semibold text-lg">{item.name}</span>
+                      <span className="text-sm text-gray-500">
+                        {item.price.toLocaleString()}원 × {item.quantity}
+                      </span>
+                    </div>
 
-                      <span className="w-8 text-center font-black text-blue-600">
-                        {item.quantity}
+                    {/* 수량 조절 */}
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center bg-gray-100 rounded-full px-3 py-1 gap-3">
+                        <button
+                          onClick={() => updateQuantity(item.id, -1)}
+                          className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow"
+                        >
+                          -
+                        </button>
+
+                        <span className="w-8 text-center font-bold text-blue-600">
+                          {item.quantity}
+                        </span>
+
+                        <button
+                          onClick={() => updateQuantity(item.id, 1)}
+                          className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow"
+                        >
+                          +
+                        </button>
+                      </div>
+
+                      <span className="font-bold w-[90px] text-right">
+                        {itemTotal.toLocaleString()}원
                       </span>
 
                       <button
-                        onClick={() => updateQuantity(item.id, 1)}
-                        className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-sm text-gray-600 active:bg-gray-200"
+                        onClick={() => removeItem(item.id)}
+                        className="text-red-500 font-bold text-xl"
                       >
-                        +
+                        ✕
                       </button>
                     </div>
-
-                    <button
-                      onClick={() => removeItem(item.id)}
-                      className="text-black font-bold hover:text-red-500 text-lg"
-                    >
-                      ✕
-                    </button>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
             <div className="border-t border-border mt-3 pt-3 flex justify-between items-center">
               <span className="text-sm text-muted-foreground">
