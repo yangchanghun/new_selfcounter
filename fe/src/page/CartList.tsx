@@ -137,9 +137,9 @@ export default function CartList() {
         value={inputValue}
         onChange={onDataChange}
         onKeyDown={onKeyDown}
-        inputMode="none" // 소프트 키보드 방지
+        // inputMode="none"
         autoFocus
-        className="absolute opacity-0 pointer-events-none"
+        // className="absolute opacity-0 pointer-events-none"
         onBlur={() => setTimeout(() => hiddenInputRef.current?.focus(), 100)}
       />
 

@@ -11,7 +11,7 @@ export default function PayPage() {
   const location = useLocation();
   const totalPrice = location.state?.totalPrice || 0;
 
-  const [completeModal, setCompleteModal] = useState(false);
+  const [completeModal, setCompleteModal] = useState(true);
   const navigate = useNavigate();
 
   const [cart, setCart] = useState<CartItem[]>(location.state?.cart || []);
@@ -55,6 +55,17 @@ export default function PayPage() {
       }),
     );
   };
+
+  useEffect(() => {
+    if (!completeModal) return;
+
+    const timer = setTimeout(() => {
+      setCompleteModal(false);
+      navigate("/");
+    }, 5000); // 5초
+
+    return () => clearTimeout(timer);
+  }, [completeModal, navigate]);
   return (
     <div className="min-h-screen bg-gray-200 flex justify-center">
       <div className="w-full md:w-[720px] min-h-screen bg-[#A8CBB3] flex flex-col shadow-xl">
@@ -153,20 +164,31 @@ export default function PayPage() {
             </button>
           </div>
         </div>
+        <button
+          onClick={() => {
+            navigate("/cart");
+          }}
+          className="bg-gray-300 border rounded-xl py-8 text-xl font-semibold shadow"
+        >
+          취소
+        </button>
       </div>
 
       {/* 🔥 결제 완료 모달 */}
+      {/* 🔥 결제 완료 모달 */}
       {completeModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center">
-          <div className="bg-white p-8 rounded-xl text-center">
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+          <div className="bg-white p-10 rounded-2xl text-center w-[420px]">
             <h2 className="text-3xl font-bold mb-4">결제 완료 🎉</h2>
-            <p className="text-lg mb-6">영수증이 출력되었습니다.</p>
+
+            <p className="text-lg mb-8">영수증이 출력되었습니다.</p>
+
             <button
               onClick={() => {
                 setCompleteModal(false);
                 navigate("/");
               }}
-              className="bg-green-500 text-white px-6 py-3 rounded-lg text-xl"
+              className="bg-green-500 text-white px-8 py-4 rounded-lg text-xl font-bold"
             >
               확인
             </button>
