@@ -9,12 +9,15 @@ interface CartItem {
 }
 export default function PayPage() {
   const location = useLocation();
-  const totalPrice = location.state?.totalPrice || 0;
 
   const [completeModal, setCompleteModal] = useState(false);
   const navigate = useNavigate();
 
   const [cart, setCart] = useState<CartItem[]>(location.state?.cart || []);
+  const totalPrice = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
   const totalCount = cart.reduce((s, i) => s + i.quantity, 0);
   const startCard = () => {
     if (window.CardBridge?.openCardApp) {
@@ -77,26 +80,27 @@ export default function PayPage() {
           />
         </div>
         {cart.length > 0 && (
-          <div className="bg-card rounded-2xl p-5 w-full max-w-sm shadow-md">
-            <p className="font-black text-card-foreground mb-3">주문 내역</p>
-            <div className="flex flex-col gap-2">
+          <div className="bg-white rounded-2xl p-6 mx-6 mt-6 shadow-md">
+            <p className="font-bold text-lg mb-4">주문 내역</p>
+
+            <div className="flex flex-col gap-3">
               {cart.map((item) => {
                 const itemTotal = item.price * item.quantity;
 
                 return (
                   <div
                     key={item.id}
-                    className="flex items-center justify-between py-2 border-b last:border-none"
+                    className="flex items-center justify-between border-b pb-3"
                   >
-                    {/* 상품 정보 */}
+                    {/* 상품 */}
                     <div className="flex flex-col">
-                      <span className="font-semibold text-lg">{item.name}</span>
+                      <span className="font-semibold">{item.name}</span>
                       <span className="text-sm text-gray-500">
                         {item.price.toLocaleString()}원 × {item.quantity}
                       </span>
                     </div>
 
-                    {/* 수량 조절 */}
+                    {/* 수량 */}
                     <div className="flex items-center gap-4">
                       <div className="flex items-center bg-gray-100 rounded-full px-3 py-1 gap-3">
                         <button
@@ -106,7 +110,7 @@ export default function PayPage() {
                           -
                         </button>
 
-                        <span className="w-8 text-center font-bold text-blue-600">
+                        <span className="w-6 text-center font-bold">
                           {item.quantity}
                         </span>
 
@@ -124,7 +128,7 @@ export default function PayPage() {
 
                       <button
                         onClick={() => removeItem(item.id)}
-                        className="text-red-500 font-bold text-xl"
+                        className="text-red-500 font-bold text-lg"
                       >
                         ✕
                       </button>
@@ -133,24 +137,16 @@ export default function PayPage() {
                 );
               })}
             </div>
-            <div className="border-t border-border mt-3 pt-3 flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">
-                총 {totalCount}개
-              </span>
-              <span className="font-black text-lg text-foreground">
-                {totalPrice.toLocaleString()}원
+
+            <div className="flex justify-between items-center mt-4 pt-4 border-t">
+              <span className="text-gray-500">총 {totalCount}개</span>
+              <span className="text-xl font-bold">
+                {totalPrice.toLocaleString()}원 을 결제하실 방법을 선택해주세요
               </span>
             </div>
           </div>
         )}
         <div className="flex-1 bg-gray-100 rounded-t-3xl -mt-6 px-6 md:px-10 pt-8 pb-10 flex flex-col">
-          <div className="bg-white shadow rounded-lg py-4 px-4 text-center text-lg font-medium mb-8">
-            <span className="font-bold text-xl">
-              {totalPrice.toLocaleString()}원
-            </span>
-            을 결제하실 방법을 선택해주세요
-          </div>
-
           <div className="grid grid-cols-2 gap-6 flex-1">
             <button className="bg-gray-300 border rounded-xl py-8 text-xl font-semibold shadow">
               카카오페이
