@@ -80,7 +80,7 @@ export default function PayPage() {
           />
         </div>
         {cart.length > 0 && (
-          <div className="bg-white rounded-2xl p-6 mx-6 mt-6 shadow-md">
+          <div className="bg-white rounded-2xl p-12 mx-12 mt-12 shadow-md">
             <p className="font-bold text-lg mb-4">주문 내역</p>
 
             <div className="flex flex-col gap-3">
