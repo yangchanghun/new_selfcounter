@@ -79,73 +79,66 @@ export default function PayPage() {
             className="w-full object-cover"
           />
         </div>
-        {cart.length > 0 && (
-          <div className="bg-white rounded-2xl p-12 mx-12 mt-12 shadow-md">
-            <p className="font-bold text-lg mb-4">주문 내역</p>
+        <div className="bg-white rounded-2xl p-12 mx-12 mt-12 shadow-md">
+          <p className="font-bold text-lg mb-4">주문 내역</p>
 
-            <div className="flex flex-col gap-3">
-              {cart.map((item) => {
-                const itemTotal = item.price * item.quantity;
+          {/* 🔥 여기 스크롤 영역 */}
+          <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto pr-2">
+            {cart.map((item) => {
+              const itemTotal = item.price * item.quantity;
 
-                return (
-                  <div
-                    key={item.id}
-                    className="flex items-center justify-between border-b pb-3"
-                  >
-                    {/* 상품 */}
-                    <div className="flex flex-col">
-                      <span className="font-semibold">{item.name}</span>
-                      <span className="text-sm text-gray-500">
-                        {item.price.toLocaleString()}원 × {item.quantity}
-                      </span>
-                    </div>
+              return (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between border-b pb-3"
+                >
+                  {/* 상품 */}
+                  <div className="flex flex-col">
+                    <span className="font-semibold">{item.name}</span>
+                    <span className="text-sm text-gray-500">
+                      {item.price.toLocaleString()}원 × {item.quantity}
+                    </span>
+                  </div>
 
-                    {/* 수량 */}
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center bg-gray-100 rounded-full px-3 py-1 gap-3">
-                        <button
-                          onClick={() => updateQuantity(item.id, -1)}
-                          className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow"
-                        >
-                          -
-                        </button>
-
-                        <span className="w-6 text-center font-bold">
-                          {item.quantity}
-                        </span>
-
-                        <button
-                          onClick={() => updateQuantity(item.id, 1)}
-                          className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow"
-                        >
-                          +
-                        </button>
-                      </div>
-
-                      <span className="font-bold w-[90px] text-right">
-                        {itemTotal.toLocaleString()}원
-                      </span>
-
-                      <button
-                        onClick={() => removeItem(item.id)}
-                        className="text-red-500 font-bold text-lg"
-                      >
-                        ✕
+                  {/* 수량 */}
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center bg-gray-100 rounded-full px-3 py-1 gap-3">
+                      <button onClick={() => updateQuantity(item.id, -1)}>
+                        {" "}
+                        -{" "}
+                      </button>
+                      <span>{item.quantity}</span>
+                      <button onClick={() => updateQuantity(item.id, 1)}>
+                        {" "}
+                        +{" "}
                       </button>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
 
-            <div className="flex justify-between items-center mt-4 pt-4 border-t">
-              <span className="text-gray-500">총 {totalCount}개</span>
-              <span className="text-xl font-bold">
-                {totalPrice.toLocaleString()}원 을 결제하실 방법을 선택해주세요
-              </span>
-            </div>
+                    <span className="font-bold w-[90px] text-right">
+                      {itemTotal.toLocaleString()}원
+                    </span>
+
+                    <button
+                      onClick={() => removeItem(item.id)}
+                      className="text-red-500 font-bold text-lg"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-        )}
+
+          {/* 총합 */}
+          <div className="flex justify-between items-center mt-4 pt-4 border-t">
+            <span className="text-gray-500">총 {totalCount}개</span>
+            <span className="text-xl font-bold">
+              {totalPrice.toLocaleString()}원 을 결제하실 방법을 선택해주세요
+            </span>
+          </div>
+        </div>
+
         <div className="flex-1 bg-gray-100 rounded-t-3xl -mt-6 px-6 md:px-10 pt-8 pb-10 flex flex-col">
           <div className="grid grid-cols-2 gap-6 flex-1">
             <button className="bg-gray-300 border rounded-xl py-8 text-xl font-semibold shadow">
