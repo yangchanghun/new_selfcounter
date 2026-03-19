@@ -9,6 +9,8 @@ interface CartItem {
 }
 export default function PayPage() {
   const location = useLocation();
+  const [alertModal, setAlertModal] = useState(false);
+  const [status, setStatus] = useState("cartCheck");
 
   const [completeModal, setCompleteModal] = useState(false);
   const navigate = useNavigate();
@@ -69,140 +71,200 @@ export default function PayPage() {
 
     return () => clearTimeout(timer);
   }, [completeModal, navigate]);
-  return (
-    <div className="min-h-screen bg-gray-200 flex justify-center">
-      <div className="w-full md:w-[720px] min-h-screen bg-[#A8CBB3] flex flex-col shadow-xl">
-        <div className="w-full">
-          <img
-            src="/kio-banner.png"
-            alt="상단 타이틀"
-            className="w-full object-cover"
-          />
-        </div>
-        {cart.length > 0 && (
-          <div className="bg-white rounded-2xl p-12 mx-12 mt-12 shadow-md">
-            <p className="font-bold text-lg mb-4">주문 내역</p>
+  if (status === "cartCheck")
+    return (
+      <div className="min-h-screen bg-gray-200 flex justify-center">
+        <div className="w-full md:w-[720px] min-h-screen bg-[#A8CBB3] flex flex-col shadow-xl">
+          <div className="w-full">
+            <img
+              src="/kio-banner.png"
+              alt="상단 타이틀"
+              className="w-full object-cover"
+            />
+          </div>
+          {cart.length > 0 && (
+            <div className="bg-white rounded-2xl p-12 mx-12 mt-12 shadow-md">
+              <p className="font-bold text-lg mb-4">주문 내역</p>
 
-            <div className="flex flex-col gap-3">
-              {cart.map((item) => {
-                const itemTotal = item.price * item.quantity;
+              <div className="flex flex-col gap-3">
+                {cart.map((item) => {
+                  const itemTotal = item.price * item.quantity;
 
-                return (
-                  <div
-                    key={item.id}
-                    className="flex items-center justify-between border-b pb-3"
-                  >
-                    {/* 상품 */}
-                    <div className="flex flex-col">
-                      <span className="font-semibold">{item.name}</span>
-                      <span className="text-sm text-gray-500">
-                        {item.price.toLocaleString()}원 × {item.quantity}
-                      </span>
-                    </div>
-
-                    {/* 수량 */}
-                    <div className="flex items-center">
-                      {/* 수량 박스 */}
-                      <div className="flex items-center bg-gray-100 rounded-full px-3 py-1">
-                        <button
-                          onClick={() => updateQuantity(item.id, -1)}
-                          className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow"
-                        >
-                          -
-                        </button>
-
-                        <span className="w-6 text-center font-bold mx-3">
-                          {item.quantity}
+                  return (
+                    <div
+                      key={item.id}
+                      className="flex items-center justify-between border-b pb-3"
+                    >
+                      {/* 상품 */}
+                      <div className="flex flex-col">
+                        <span className="font-semibold">{item.name}</span>
+                        <span className="text-sm text-gray-500">
+                          {item.price.toLocaleString()}원 × {item.quantity}
                         </span>
-
-                        <button
-                          onClick={() => updateQuantity(item.id, 1)}
-                          className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow"
-                        >
-                          +
-                        </button>
                       </div>
 
-                      {/* 가격 */}
-                      <span className="ml-4 font-bold w-[90px] text-right">
-                        {itemTotal.toLocaleString()}원
-                      </span>
+                      {/* 수량 */}
+                      <div className="flex items-center">
+                        {/* 수량 박스 */}
+                        <div className="flex items-center bg-gray-100 rounded-full px-3 py-1">
+                          <button
+                            onClick={() => updateQuantity(item.id, -1)}
+                            className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow"
+                          >
+                            -
+                          </button>
 
-                      {/* 삭제 */}
-                      <button
-                        onClick={() => removeItem(item.id)}
-                        className="ml-4 text-red-500 font-bold text-lg"
-                      >
-                        ✕
-                      </button>
+                          <span className="w-6 text-center font-bold mx-3">
+                            {item.quantity}
+                          </span>
+
+                          <button
+                            onClick={() => updateQuantity(item.id, 1)}
+                            className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow"
+                          >
+                            +
+                          </button>
+                        </div>
+
+                        {/* 가격 */}
+                        <span className="ml-4 font-bold w-[90px] text-right">
+                          {itemTotal.toLocaleString()}원
+                        </span>
+
+                        {/* 삭제 */}
+                        <button
+                          onClick={() => removeItem(item.id)}
+                          className="ml-4 text-red-500 font-bold text-lg"
+                        >
+                          ✕
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
 
-            <div className="flex justify-between items-center mt-4 pt-4 border-t">
-              <span className="text-gray-500">총 {totalCount}개</span>
-              <span className="text-xl font-bold">
-                {totalPrice.toLocaleString()}원 을 결제하실 방법을 선택해주세요
-              </span>
+              <div className="flex justify-between items-center mt-4 pt-4 border-t">
+                <span className="text-gray-500">총 {totalCount}개</span>
+                <span className="text-xl font-bold">
+                  {totalPrice.toLocaleString()}원 을 결제하실 방법을
+                  선택해주세요
+                </span>
+              </div>
+            </div>
+          )}
+
+          <button
+            className="bg-gray-300 border rounded-xl py-8 text-xl font-semibold shadow"
+            onClick={() => {
+              setStatus("payCheck");
+            }}
+          >
+            결제하러가기
+          </button>
+
+          <button
+            onClick={() => {
+              navigate("/cart");
+            }}
+            className="bg-gray-300 border rounded-xl py-8 text-xl font-semibold shadow"
+          >
+            취소
+          </button>
+        </div>
+
+        {/* 🔥 결제 완료 모달 */}
+        {/* 🔥 결제 완료 모달 */}
+        {completeModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+            <div className="bg-white p-10 rounded-2xl text-center w-[420px]">
+              <h2 className="text-3xl font-bold mb-4">결제 완료 🎉</h2>
+
+              <p className="text-lg mb-8">영수증이 출력되었습니다.</p>
+
+              <button
+                onClick={() => {
+                  setCompleteModal(false);
+                  navigate("/");
+                }}
+                className="bg-green-500 text-white px-8 py-4 rounded-lg text-xl font-bold"
+              >
+                확인
+              </button>
             </div>
           </div>
         )}
-
-        <div className="flex-1 bg-gray-100 rounded-t-3xl -mt-6 px-6 md:px-10 pt-8 pb-10 flex flex-col">
-          <div className="grid grid-cols-2 gap-6 flex-1">
-            <button className="bg-gray-300 border rounded-xl py-8 text-xl font-semibold shadow">
-              카카오페이
-            </button>
-
-            <button
-              onClick={startCard}
-              className="bg-white border rounded-xl py-8 text-xl font-semibold shadow"
-            >
-              카드결제
-            </button>
-
-            <button className="bg-gray-300 border rounded-xl py-8 text-xl font-semibold shadow">
-              현금결제
-            </button>
-
-            <button className="bg-gray-300 border rounded-xl py-8 text-xl font-semibold shadow">
-              QR결제
-            </button>
-          </div>
-        </div>
-        <button
-          onClick={() => {
-            navigate("/cart");
-          }}
-          className="bg-gray-300 border rounded-xl py-8 text-xl font-semibold shadow"
-        >
-          취소
-        </button>
       </div>
-
-      {/* 🔥 결제 완료 모달 */}
-      {/* 🔥 결제 완료 모달 */}
-      {completeModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-          <div className="bg-white p-10 rounded-2xl text-center w-[420px]">
-            <h2 className="text-3xl font-bold mb-4">결제 완료 🎉</h2>
-
-            <p className="text-lg mb-8">영수증이 출력되었습니다.</p>
-
-            <button
-              onClick={() => {
-                setCompleteModal(false);
-                navigate("/");
-              }}
-              className="bg-green-500 text-white px-8 py-4 rounded-lg text-xl font-bold"
-            >
-              확인
-            </button>
-          </div>
+    );
+  if (status === "payCheck")
+    return (
+      <div className="flex-1 bg-gray-100 rounded-t-3xl -mt-6 px-6 md:px-10 pt-8 pb-6 flex flex-col">
+        {/* 제목 */}
+        <div className="text-center mb-6">
+          <p className="text-gray-500 text-sm">결제 방법 선택</p>
+          <h2 className="text-2xl font-bold">원하시는 결제를 선택해주세요</h2>
         </div>
-      )}
-    </div>
-  );
+
+        {/* 결제 버튼 영역 */}
+        <button
+          onClick={() => setAlertModal(true)}
+          className="bg-white border rounded-2xl py-10 text-xl font-bold shadow active:scale-95 transition"
+        >
+          카카오페이
+        </button>
+        <button
+          onClick={() => startCard()}
+          className="bg-white border rounded-2xl py-10 text-xl font-bold shadow active:scale-95 transition"
+        >
+          카드결제
+        </button>
+        <button
+          onClick={() => setAlertModal(true)}
+          className="bg-white border rounded-2xl py-10 text-xl font-semibold shadow active:scale-95 transition"
+        >
+          현금결제
+        </button>
+
+        <button
+          onClick={() => setAlertModal(true)}
+          className="bg-white border rounded-2xl py-10 text-xl font-semibold shadow active:scale-95 transition"
+        >
+          QR결제
+        </button>
+
+        {/* 총 금액 표시 */}
+        <div className="mt-6 bg-white rounded-xl p-4 flex justify-between items-center shadow">
+          <span className="text-gray-500">총 결제 금액</span>
+          <span className="text-2xl font-bold text-green-600">
+            {totalPrice.toLocaleString()}원
+          </span>
+        </div>
+
+        {/* 하단 버튼 */}
+        <div className="mt-4 flex">
+          <button
+            onClick={() => navigate("/cart")}
+            className="w-full bg-gray-300 rounded-xl py-6 text-xl font-semibold shadow active:scale-95 transition"
+          >
+            취소
+          </button>
+        </div>
+        {alertModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+            <div className="bg-white p-10 rounded-2xl text-center w-[420px]">
+              <h2 className="text-2xl font-bold mb-4">안내</h2>
+
+              <p className="text-lg mb-8">현재는 카드결제만 가능합니다.</p>
+
+              <button
+                onClick={() => setAlertModal(false)}
+                className="bg-green-500 text-white px-8 py-4 rounded-lg text-xl font-bold active:scale-95 transition"
+              >
+                확인
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
 }
