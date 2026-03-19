@@ -249,20 +249,59 @@ export default function PayPage() {
           </button>
         </div>
         {alertModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-60 z-50">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-              <div className="bg-white p-10 rounded-2xl text-center w-[420px]">
-                <h2 className="text-2xl font-bold mb-4">안내</h2>
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              backgroundColor: "rgba(0,0,0,0.6)",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              zIndex: 9999,
+            }}
+          >
+            <div
+              style={{
+                background: "#fff",
+                padding: "40px",
+                borderRadius: "20px",
+                width: "420px",
+                textAlign: "center",
+                boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
+              }}
+            >
+              <h2
+                style={{
+                  fontSize: "24px",
+                  fontWeight: "bold",
+                  marginBottom: "16px",
+                }}
+              >
+                안내
+              </h2>
 
-                <p className="text-lg mb-8">현재는 카드결제만 가능합니다.</p>
+              <p style={{ fontSize: "18px", marginBottom: "30px" }}>
+                현재는 카드결제만 가능합니다.
+              </p>
 
-                <button
-                  onClick={() => setAlertModal(false)}
-                  className="bg-green-500 text-white px-8 py-4 rounded-lg text-xl font-bold active:scale-95 transition"
-                >
-                  확인
-                </button>
-              </div>
+              <button
+                onClick={() => setAlertModal(false)}
+                style={{
+                  backgroundColor: "#22c55e",
+                  color: "#fff",
+                  padding: "12px 24px",
+                  borderRadius: "10px",
+                  fontSize: "18px",
+                  fontWeight: "bold",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                확인
+              </button>
             </div>
           </div>
         )}
