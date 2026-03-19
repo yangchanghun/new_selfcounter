@@ -200,7 +200,7 @@ export default function PayPage() {
           onClick={() => startCard()}
           className="bg-white border rounded-2xl py-10 text-xl font-bold shadow active:scale-95 transition"
         >
-          카카오페이
+          삼성페이
         </button>
         <button
           onClick={() => startCard()}

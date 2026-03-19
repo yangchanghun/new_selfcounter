@@ -1,0 +1,10 @@
+.bat {
+  width: 1px;
+  height: 1px;
+  transform: sace(4);
+  position: relative;
+  left: -128px;
+  top: -12px;
+  -webkit-animation: 0.4s bat steps(1) infinite;
+  animation: 0.4s bat steps(1) infinite;
+}
