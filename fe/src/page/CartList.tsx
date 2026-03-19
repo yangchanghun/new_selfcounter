@@ -52,7 +52,7 @@ export default function CartList() {
       // 동일한 바코드가 500ms(0.5초) 이내에 다시 들어오면 무시
       if (
         raw === lastScannedRef.current.barcode &&
-        now - lastScannedRef.current.time < 500
+        now - lastScannedRef.current.time < 1000
       ) {
         console.log("중복 스캔 차단됨:", raw);
         setInputValue(""); // 입력창만 비우고 리턴
