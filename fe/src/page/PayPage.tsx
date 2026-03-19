@@ -30,6 +30,16 @@ export default function PayPage() {
     }
   };
 
+  const startCash = () => {
+    if (window.AndroidBridge?.printReceipt) {
+      window.AndroidBridge.printReceipt(JSON.stringify(cart));
+      setCompleteModal(true);
+    } else {
+      // setDebug("없음");
+      alert("AndroidBridge 없음 (웹에서 실행 중)");
+    }
+  };
+
   useEffect(() => {
     window.onCardPaymentComplete = () => {
       console.log("카드 결제 완료");
@@ -187,7 +197,7 @@ export default function PayPage() {
 
         {/* 결제 버튼 영역 */}
         <button
-          onClick={() => setAlertModal(true)}
+          onClick={() => startCard()}
           className="bg-white border rounded-2xl py-10 text-xl font-bold shadow active:scale-95 transition"
         >
           카카오페이
@@ -199,17 +209,10 @@ export default function PayPage() {
           카드결제
         </button>
         <button
-          onClick={() => setAlertModal(true)}
+          onClick={() => startCash()}
           className="bg-white border rounded-2xl py-10 text-xl font-semibold shadow active:scale-95 transition"
         >
           현금결제
-        </button>
-
-        <button
-          onClick={() => setAlertModal(true)}
-          className="bg-white border rounded-2xl py-10 text-xl font-semibold shadow active:scale-95 transition"
-        >
-          QR결제
         </button>
 
         {/* 총 금액 표시 */}
