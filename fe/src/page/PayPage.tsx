@@ -174,25 +174,6 @@ export default function PayPage() {
 
         {/* 🔥 결제 완료 모달 */}
         {/* 🔥 결제 완료 모달 */}
-        {completeModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-            <div className="bg-white p-10 rounded-2xl text-center w-[420px]">
-              <h2 className="text-3xl font-bold mb-4">결제 완료 🎉</h2>
-
-              <p className="text-lg mb-8">영수증이 출력되었습니다.</p>
-
-              <button
-                onClick={() => {
-                  setCompleteModal(false);
-                  navigate("/");
-                }}
-                className="bg-green-500 text-white px-8 py-4 rounded-lg text-xl font-bold"
-              >
-                확인
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     );
   if (status === "payCheck")
@@ -295,6 +276,71 @@ export default function PayPage() {
                   padding: "12px 24px",
                   borderRadius: "10px",
                   fontSize: "18px",
+                  fontWeight: "bold",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                확인
+              </button>
+            </div>
+          </div>
+        )}
+        {completeModal && (
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              backgroundColor: "rgba(0,0,0,0.6)",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              zIndex: 9999,
+            }}
+          >
+            <div
+              style={{
+                background: "#fff",
+                padding: "40px",
+                borderRadius: "20px",
+                textAlign: "center",
+                width: "420px",
+                boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
+              }}
+            >
+              <h2
+                style={{
+                  fontSize: "28px",
+                  fontWeight: "bold",
+                  marginBottom: "16px",
+                }}
+              >
+                결제 완료 🎉
+              </h2>
+
+              <p
+                style={{
+                  fontSize: "18px",
+                  marginBottom: "30px",
+                }}
+              >
+                영수증이 출력되었습니다.
+              </p>
+
+              <button
+                onClick={() => {
+                  setCompleteModal(false);
+                  navigate("/");
+                }}
+                style={{
+                  backgroundColor: "#22c55e",
+                  color: "#fff",
+                  padding: "16px 32px",
+                  borderRadius: "12px",
+                  fontSize: "20px",
                   fontWeight: "bold",
                   border: "none",
                   cursor: "pointer",
