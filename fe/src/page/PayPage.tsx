@@ -147,8 +147,7 @@ export default function PayPage() {
               <div className="flex justify-between items-center mt-4 pt-4 border-t">
                 <span className="text-gray-500">총 {totalCount}개</span>
                 <span className="text-xl font-bold">
-                  {totalPrice.toLocaleString()}원 을 결제하실 방법을
-                  선택해주세요
+                  {totalPrice.toLocaleString()}원
                 </span>
               </div>
             </div>
@@ -250,18 +249,20 @@ export default function PayPage() {
           </button>
         </div>
         {alertModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-            <div className="bg-white p-10 rounded-2xl text-center w-[420px]">
-              <h2 className="text-2xl font-bold mb-4">안내</h2>
+          <div className="fixed inset-0 bg-black bg-opacity-60 z-50">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+              <div className="bg-white p-10 rounded-2xl text-center w-[420px]">
+                <h2 className="text-2xl font-bold mb-4">안내</h2>
 
-              <p className="text-lg mb-8">현재는 카드결제만 가능합니다.</p>
+                <p className="text-lg mb-8">현재는 카드결제만 가능합니다.</p>
 
-              <button
-                onClick={() => setAlertModal(false)}
-                className="bg-green-500 text-white px-8 py-4 rounded-lg text-xl font-bold active:scale-95 transition"
-              >
-                확인
-              </button>
+                <button
+                  onClick={() => setAlertModal(false)}
+                  className="bg-green-500 text-white px-8 py-4 rounded-lg text-xl font-bold active:scale-95 transition"
+                >
+                  확인
+                </button>
+              </div>
             </div>
           </div>
         )}
